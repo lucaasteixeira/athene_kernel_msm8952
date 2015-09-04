@@ -1454,8 +1454,8 @@ static struct v4l2_file_operations msm_ispif_v4l2_subdev_fops;
 static long msm_ispif_subdev_ioctl(struct v4l2_subdev *sd,
 	unsigned int cmd, void *arg)
 {
-	struct ispif_device *ispif =
-		(struct ispif_device *)v4l2_get_subdevdata(sd);
+	struct ispif_device *ispif = (
+		struct ispif_device *)v4l2_get_subdevdata(sd);
 
 	switch (cmd) {
 	case VIDIOC_MSM_ISPIF_CFG:
@@ -1468,11 +1468,6 @@ static long msm_ispif_subdev_ioctl(struct v4l2_subdev *sd,
 		return 0;
 	}
 	case MSM_SD_SHUTDOWN: {
-		if (ispif && ispif->base) {
-			mutex_lock(&ispif->mutex);
-			msm_ispif_release(ispif);
-			mutex_unlock(&ispif->mutex);
-		}
 		return 0;
 	}
 	default:
