@@ -245,6 +245,7 @@ endif
 
 header-y += l2tp.h
 header-y += limits.h
+header-y += lirc.h
 header-y += llc.h
 header-y += loop.h
 header-y += lp.h
