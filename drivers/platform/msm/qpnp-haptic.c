@@ -1572,6 +1572,10 @@ static void qpnp_timed_enable_worker(struct work_struct *work)
 	value = hap->td_value;
 	spin_unlock(&hap->td_lock);
 
+	/* Vibrator already disabled */
+	if (!value && !hap->state)
+		return;
+
 	mutex_lock(&hap->lock);
 	hrtimer_cancel(&hap->hap_timer);
 
@@ -1722,6 +1726,10 @@ static enum hrtimer_restart qpnp_hap_timer(struct hrtimer *timer)
 {
 	struct qpnp_hap *hap = container_of(timer, struct qpnp_hap,
 							 hap_timer);
+
+	/* Vibrator already disabled */
+	if (!hap->state)
+		return HRTIMER_NORESTART;
 
 	hap->state = 0;
 	schedule_work(&hap->work);
