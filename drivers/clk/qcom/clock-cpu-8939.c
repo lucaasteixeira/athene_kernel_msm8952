@@ -55,6 +55,7 @@ struct cpu_clk_8939 {
 	struct clk c;
 };
 
+/* Perf or big Cluster */
 static struct mux_div_clk a53ssmux_bc = {
 	.ops = &rcg_mux_div_ops,
 	.safe_freq = 400000000,
@@ -65,6 +66,7 @@ static struct mux_div_clk a53ssmux_bc = {
 	},
 	.c = {
 		.dbg_name = "a53ssmux_bc",
+		.flags = CLKFLAG_NO_RATE_CACHE,
 		.ops = &clk_ops_mux_div_clk,
 		CLK_INIT(a53ssmux_bc.c),
 	},
@@ -74,6 +76,7 @@ static struct mux_div_clk a53ssmux_bc = {
 	.src_shift = 8,
 };
 
+/* Power or LITTLE Cluster */
 static struct mux_div_clk a53ssmux_lc = {
 	.ops = &rcg_mux_div_ops,
 	.safe_freq = 200000000,
@@ -84,6 +87,7 @@ static struct mux_div_clk a53ssmux_lc = {
 	},
 	.c = {
 		.dbg_name = "a53ssmux_lc",
+		.flags = CLKFLAG_NO_RATE_CACHE,
 		.ops = &clk_ops_mux_div_clk,
 		CLK_INIT(a53ssmux_lc.c),
 	},
