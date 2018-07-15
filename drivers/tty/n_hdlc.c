@@ -178,9 +178,9 @@ static int maxframe = 4096;
 /* TTY callbacks */
 
 static ssize_t n_hdlc_tty_read(struct tty_struct *tty, struct file *file,
-			   __u8 __user *buf, size_t nr);
+			       __u8 __user *buf, size_t nr);
 static ssize_t n_hdlc_tty_write(struct tty_struct *tty, struct file *file,
-			    const unsigned char *buf, size_t nr);
+				const unsigned char *buf, size_t nr);
 static int n_hdlc_tty_ioctl(struct tty_struct *tty, struct file *file,
 			    unsigned int cmd, unsigned long arg);
 static unsigned int n_hdlc_tty_poll(struct tty_struct *tty, struct file *filp,
@@ -576,7 +576,7 @@ static void n_hdlc_tty_receive(struct tty_struct *tty, const __u8 *data,
  * Returns the number of bytes returned or error code.
  */
 static ssize_t n_hdlc_tty_read(struct tty_struct *tty, struct file *file,
-			   __u8 __user *buf, size_t nr)
+			       __u8 __user *buf, size_t nr)
 {
 	struct n_hdlc *n_hdlc = tty2n_hdlc(tty);
 	int ret = 0;
@@ -660,7 +660,7 @@ static ssize_t n_hdlc_tty_read(struct tty_struct *tty, struct file *file,
  * Returns the number of bytes written (or error code).
  */
 static ssize_t n_hdlc_tty_write(struct tty_struct *tty, struct file *file,
-			    const unsigned char *data, size_t count)
+				const unsigned char *data, size_t count)
 {
 	struct n_hdlc *n_hdlc = tty2n_hdlc (tty);
 	int error = 0;
@@ -931,6 +931,7 @@ static struct n_hdlc_buf* n_hdlc_buf_get(struct n_hdlc_buf_list *list)
 {
 	unsigned long flags;
 	struct n_hdlc_buf *buf;
+
 	spin_lock_irqsave(&list->spinlock,flags);
 	
 	buf = list->head;
