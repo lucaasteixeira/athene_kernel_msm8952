@@ -2955,8 +2955,9 @@ static ssize_t te_enable_store(struct device *dev,
 			pr_err("Failed sending TE command, r=%d\n", r);
 			r = -EFAULT;
 			goto locked_end;
-		} else
+		} else {
 			te_status = enable;
+		}
 	}
 locked_end:
 	mdss_mdp_clk_ctrl(MDP_BLOCK_POWER_OFF);
