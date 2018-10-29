@@ -676,6 +676,15 @@ config ALSA_TO_H2W
 	  /sys/class/switch/h2w/state used by Android headset observer.
 	default n
 
+config MOTO_DTV
+	tristate "FC8300 DTV module support"
+	default n
+	help
+	  Enable/disable FC8300 DTV module support.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called isdbt.
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
