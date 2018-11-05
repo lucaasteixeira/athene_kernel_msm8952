@@ -470,9 +470,11 @@ static ssize_t show_cpuinfo_cur_freq(struct cpufreq_policy *policy,
 					char *buf)
 {
 	unsigned int cur_freq = __cpufreq_get(policy->cpu);
-	if (!cur_freq)
-		return sprintf(buf, "<unknown>");
-	return sprintf(buf, "%u\n", cur_freq);
+
+	if (cur_freq)
+		return sprintf(buf, "%u\n", cur_freq);
+
+	return sprintf(buf, "<unknown>\n");
 }
 
 /**
@@ -907,8 +909,11 @@ static int cpufreq_add_policy_cpu(struct cpufreq_policy *policy,
 	up_write(&policy->rwsem);
 
 	if (has_target()) {
-		if ((ret = __cpufreq_governor(policy, CPUFREQ_GOV_START)) ||
-			(ret = __cpufreq_governor(policy, CPUFREQ_GOV_LIMITS))) {
+		ret = __cpufreq_governor(policy, CPUFREQ_GOV_START);
+		if (!ret)
+			ret = __cpufreq_governor(policy, CPUFREQ_GOV_LIMITS);
+
+ 		if (ret) {
 			pr_err("%s: Failed to start governor for CPU%u, policy CPU%u\n",
 			       __func__, cpu, policy->cpu);
 			return ret;
@@ -1353,14 +1358,14 @@ static int __cpufreq_remove_dev_finish(struct device *dev,
 
 		if (!frozen)
 			cpufreq_policy_free(policy);
-	} else {
-		if (has_target()) {
-			if ((ret = __cpufreq_governor(policy, CPUFREQ_GOV_START)) ||
-					(ret = __cpufreq_governor(policy, CPUFREQ_GOV_LIMITS))) {
-				pr_err("%s: Failed to start governor for CPU%u, policy CPU%u\n",
-						__func__, cpu, policy->cpu);
-				return ret;
-			}
+	} else if (has_target()) {
+		ret = __cpufreq_governor(policy, CPUFREQ_GOV_START);
+		if (!ret)
+			ret = __cpufreq_governor(policy, CPUFREQ_GOV_LIMITS);
+
+ 		if (ret) {
+			pr_err("%s: Failed to start governor\n", __func__);
+			return ret;
 		}
 	}
 
@@ -2047,8 +2052,7 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 			if (policy->governor) {
 				__cpufreq_governor(policy, CPUFREQ_GOV_STOP);
 				up_write(&policy->rwsem);
-				__cpufreq_governor(policy,
-						CPUFREQ_GOV_POLICY_EXIT);
+				__cpufreq_governor(policy, CPUFREQ_GOV_POLICY_EXIT);
 				down_write(&policy->rwsem);
 			}
 
