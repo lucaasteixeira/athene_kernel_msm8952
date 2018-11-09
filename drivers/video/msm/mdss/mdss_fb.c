@@ -2217,8 +2217,6 @@ int mdss_fb_alloc_fb_ion_memory(struct msm_fb_data_type *mfd, size_t fb_size)
 
 fb_mmap_failed:
 	ion_free(mfd->fb_ion_client, mfd->fb_ion_handle);
-	mfd->fb_ion_handle = NULL;
-	mfd->fbmem_buf = NULL;
 	return rc;
 }
 
@@ -2990,8 +2988,9 @@ static int mdss_fb_release_all(struct fb_info *info, bool release_all)
 			pr_err("can't turn off fb%d! rc=%d current process=%s pid=%d known pid=%d\n",
 			      mfd->index, ret, task->comm, current->tgid, pid);
 			return ret;
-		} else
+		} else {
 			fb_notifier_call_chain(FB_EVENT_BLANK, &event);
+		}
 
 		if (mfd->fb_ion_handle)
 			mdss_fb_free_fb_ion_memory(mfd);
