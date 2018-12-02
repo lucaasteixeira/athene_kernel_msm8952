@@ -34,6 +34,7 @@ enum {
 	Opt_reserved_mb,
 	Opt_gid_derivation,
 	Opt_default_normal,
+	Opt_nocache,
 	Opt_err,
 };
 
@@ -48,6 +49,7 @@ static const match_table_t sdcardfs_tokens = {
 	{Opt_gid_derivation, "derive_gid"},
 	{Opt_default_normal, "default_normal"},
 	{Opt_reserved_mb, "reserved_mb=%u"},
+	{Opt_nocache, "nocache"},
 	{Opt_err, NULL}
 };
 
@@ -71,6 +73,7 @@ static int parse_options(struct super_block *sb, char *options, int silent,
 	/* by default, gid derivation is off */
 	opts->gid_derivation = false;
 	opts->default_normal = false;
+	opts->nocache = false;
 
 	*debug = 0;
 
@@ -127,6 +130,9 @@ static int parse_options(struct super_block *sb, char *options, int silent,
 			break;
 		case Opt_default_normal:
 			opts->default_normal = true;
+			break;
+		case Opt_nocache:
+			opts->nocache = true;
 			break;
 		/* unknown option */
 		default:
@@ -341,13 +347,11 @@ static int sdcardfs_read_super(struct vfsmount *mnt, struct super_block *sb,
 	mutex_lock(&sdcardfs_super_list_lock);
 	if (sb_info->options.multiuser) {
 		setup_derived_state(sb->s_root->d_inode, PERM_PRE_ROOT,
-				sb_info->options.fs_user_id, AID_ROOT,
-				false, SDCARDFS_I(sb->s_root->d_inode)->data);
+				sb_info->options.fs_user_id, AID_ROOT);
 		snprintf(sb_info->obbpath_s, PATH_MAX, "%s/obb", dev_name);
 	} else {
 		setup_derived_state(sb->s_root->d_inode, PERM_ROOT,
-				sb_info->options.fs_user_id, AID_ROOT,
-				false, SDCARDFS_I(sb->s_root->d_inode)->data);
+				sb_info->options.fs_user_id, AID_ROOT);
 		snprintf(sb_info->obbpath_s, PATH_MAX, "%s/Android/obb", dev_name);
 	}
 	fixup_tmp_permissions(sb->s_root->d_inode);
