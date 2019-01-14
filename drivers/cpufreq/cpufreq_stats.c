@@ -118,7 +118,6 @@ static struct uid_entry *find_or_register_uid(uid_t uid)
 	return uid_entry;
 }
 
-
 static int uid_time_in_state_show(struct seq_file *m, void *v)
 {
 	struct uid_entry *uid_entry;
@@ -234,14 +233,18 @@ static int cpufreq_stats_update(unsigned int cpu)
 
 void cpufreq_task_stats_init(struct task_struct *p)
 {
-	size_t alloc_size;
-	void *temp;
 	unsigned long flags;
-
 	spin_lock_irqsave(&task_time_in_state_lock, flags);
 	p->time_in_state = NULL;
 	spin_unlock_irqrestore(&task_time_in_state_lock, flags);
 	WRITE_ONCE(p->max_states, 0);
+}
+
+void cpufreq_task_stats_alloc(struct task_struct *p)
+{
+	size_t alloc_size;
+	void *temp;
+	unsigned long flags;
 
 	if (!all_freq_table || !cpufreq_all_freq_init)
 		return;
@@ -588,8 +591,10 @@ static int __cpufreq_stats_create_table(struct cpufreq_policy *policy,
 	struct cpufreq_stats *stat;
 	unsigned int alloc_size;
 	unsigned int cpu = policy->cpu;
+
 	if (per_cpu(cpufreq_stats_table, cpu))
-		return -EBUSY;
+		return 0;
+
 	stat = kzalloc(sizeof(*stat), GFP_KERNEL);
 	if ((stat) == NULL) {
 		pr_err("Failed to alloc cpufreq_stats table\n");
@@ -1013,6 +1018,11 @@ static int process_notifier(struct notifier_block *self,
 	rt_mutex_unlock(&uid_lock);
 	kfree(temp);
 	return NOTIFY_OK;
+}
+
+void cpufreq_task_stats_free(struct task_struct *p)
+{
+	kfree(p->time_in_state);
 }
 
 static int uid_time_in_state_open(struct inode *inode, struct file *file)

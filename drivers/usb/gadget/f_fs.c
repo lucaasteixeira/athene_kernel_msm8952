@@ -968,7 +968,7 @@ first_try:
 	mutex_unlock(&epfile->mutex);
 error:
 	kfree(data);
-	if (ret < 0)
+	if (ret < 0 && ret != -ERESTARTSYS)
 		pr_err("Error: returning %zd value\n", ret);
 	return ret;
 }
@@ -1025,7 +1025,7 @@ static long ffs_epfile_ioctl(struct file *file, unsigned code,
 			     unsigned long value)
 {
 	struct ffs_epfile *epfile = file->private_data;
-	int ret;
+	int ret = 0;
 
 	ENTER();
 
